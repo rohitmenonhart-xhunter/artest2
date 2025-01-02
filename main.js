@@ -46,12 +46,94 @@ document.addEventListener('DOMContentLoaded', () => {
 		const arrowGeometry = new THREE.PlaneGeometry(0.4, 0.4);
 		const arrow = new THREE.Mesh(arrowGeometry, arrowMaterial);
 		
-		// Position icons at the bottom
-		phoneIcon.position.set(-0.4, -0.8, 0);
-		emailIcon.position.set(0, -0.8, 0);
-		webIcon.position.set(0.4, -0.8, 0);
-		arrow.position.set(0, -0.4, 0);
+		// Position icons at the bottom (starting positions will be higher for intro animation)
+		phoneIcon.position.set(-0.4, 2, 0); // Start from above
+		emailIcon.position.set(0, 2, 0);    // Start from above
+		webIcon.position.set(0.4, 2, 0);    // Start from above
+		arrow.position.set(0, 2, 0);        // Start from above
+
+		// Set initial scale to 0 for intro animation
+		phoneIcon.scale.set(0, 0, 0);
+		emailIcon.scale.set(0, 0, 0);
+		webIcon.scale.set(0, 0, 0);
+		arrow.scale.set(0, 0, 0);
+
+		// Animation timing variables
+		const startTime = Date.now();
+		const introDuration = 1000; // 1 second for intro animation
+		const staggerDelay = 200;   // 200ms delay between each icon
 		
+		// Final positions
+		const finalPositions = {
+			arrow: -0.4,
+			phone: -0.8,
+			email: -0.8,
+			web: -0.8
+		};
+
+		// Animate the arrow and icons
+		const animateIntro = () => {
+			const currentTime = Date.now();
+			const elapsedTime = currentTime - startTime;
+
+			// Animate arrow
+			if (elapsedTime > 0) {
+				const arrowProgress = Math.min(1, elapsedTime / introDuration);
+				arrow.position.y = 2 + (finalPositions.arrow - 2) * easeOutBack(arrowProgress);
+				arrow.scale.set(
+					easeOutBack(arrowProgress),
+					easeOutBack(arrowProgress),
+					easeOutBack(arrowProgress)
+				);
+			}
+
+			// Animate phone icon
+			if (elapsedTime > staggerDelay) {
+				const phoneProgress = Math.min(1, (elapsedTime - staggerDelay) / introDuration);
+				phoneIcon.position.y = 2 + (finalPositions.phone - 2) * easeOutBack(phoneProgress);
+				phoneIcon.scale.set(
+					easeOutBack(phoneProgress),
+					easeOutBack(phoneProgress),
+					easeOutBack(phoneProgress)
+				);
+			}
+
+			// Animate email icon
+			if (elapsedTime > staggerDelay * 2) {
+				const emailProgress = Math.min(1, (elapsedTime - staggerDelay * 2) / introDuration);
+				emailIcon.position.y = 2 + (finalPositions.email - 2) * easeOutBack(emailProgress);
+				emailIcon.scale.set(
+					easeOutBack(emailProgress),
+					easeOutBack(emailProgress),
+					easeOutBack(emailProgress)
+				);
+			}
+
+			// Animate web icon
+			if (elapsedTime > staggerDelay * 3) {
+				const webProgress = Math.min(1, (elapsedTime - staggerDelay * 3) / introDuration);
+				webIcon.position.y = 2 + (finalPositions.web - 2) * easeOutBack(webProgress);
+				webIcon.scale.set(
+					easeOutBack(webProgress),
+					easeOutBack(webProgress),
+					easeOutBack(webProgress)
+				);
+			}
+		};
+
+		// Easing function for smooth animation
+		const easeOutBack = (x) => {
+			const c1 = 1.70158;
+			const c3 = c1 + 1;
+			return 1 + c3 * Math.pow(x - 1, 3) + c1 * Math.pow(x - 1, 2);
+		};
+
+		// Continuous arrow hover animation
+		const animateArrowHover = () => {
+			arrow.position.y = finalPositions.arrow + Math.sin(Date.now() * 0.003) * 0.1;
+			arrow.rotation.z = Math.sin(Date.now() * 0.002) * 0.1;
+		};
+
 		// Make icons interactive
 		const raycaster = new THREE.Raycaster();
 		const mouse = new THREE.Vector2();
@@ -141,12 +223,6 @@ document.addEventListener('DOMContentLoaded', () => {
 		airplaneAnchor.group.add(webIcon);
 		airplaneAnchor.group.add(arrow);
 		
-		// Animate the arrow
-		const animateArrow = () => {
-			arrow.position.y = -0.4 + Math.sin(Date.now() * 0.003) * 0.1; // Smooth up and down motion
-			arrow.rotation.z = Math.sin(Date.now() * 0.002) * 0.1; // Slight rotation
-		};
-		
 		// Add arrow animation to the render loop
 		renderer.setAnimationLoop(() => {
 			const delta = clock.getDelta();
@@ -156,7 +232,11 @@ document.addEventListener('DOMContentLoaded', () => {
 			carMixer.update(delta);
 			car.scene.rotation.set(0, car.scene.rotation.y + delta, 0);
 			dogMixer.update(delta);
-			animateArrow(); // Add arrow animation
+			
+			// Run both animations
+			animateIntro();
+			animateArrowHover();
+			
 			renderer.render(scene, camera);
 		});
 		
