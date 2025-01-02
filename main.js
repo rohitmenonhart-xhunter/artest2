@@ -154,11 +154,20 @@ document.addEventListener('DOMContentLoaded', () => {
 		const raycaster = new THREE.Raycaster();
 		const mouse = new THREE.Vector2();
 		
-		// Add click event listener
-		document.addEventListener('click', (event) => {
+		// Function to handle both click and touch
+		const handleInteraction = (event) => {
+			// Prevent default behavior
+			event.preventDefault();
+			
+			// Get the correct coordinates whether it's touch or click
+			const x = event.clientX || (event.touches && event.touches[0].clientX);
+			const y = event.clientY || (event.touches && event.touches[0].clientY);
+			
+			if (x === undefined || y === undefined) return;
+			
 			// Calculate mouse position in normalized device coordinates
-			mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
-			mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
+			mouse.x = (x / window.innerWidth) * 2 - 1;
+			mouse.y = -(y / window.innerHeight) * 2 + 1;
 			
 			// Update the picking ray with the camera and mouse position
 			raycaster.setFromCamera(mouse, camera);
@@ -169,14 +178,19 @@ document.addEventListener('DOMContentLoaded', () => {
 			if (intersects.length > 0) {
 				const clickedIcon = intersects[0].object;
 				if (clickedIcon === phoneIcon) {
-					window.location.href = 'tel:+1234567890'; // Replace with your phone number
+					window.open('tel:+1234567890', '_blank'); // Replace with your phone number
 				} else if (clickedIcon === emailIcon) {
-					window.location.href = 'mailto:example@email.com'; // Replace with your email
+					window.open('mailto:example@email.com', '_blank'); // Replace with your email
 				} else if (clickedIcon === webIcon) {
-					window.location.href = 'https://your-website.com'; // Replace with your website
+					window.open('https://your-website.com', '_blank'); // Replace with your website
 				}
 			}
-		});
+		};
+		
+		// Add both touch and click event listeners
+		document.addEventListener('click', handleInteraction);
+		document.addEventListener('touchstart', handleInteraction);
+		document.addEventListener('touchend', handleInteraction);
 		
 		const topPlaneMaterial = new THREE.MeshBasicMaterial({map: topTexture, transparent: true});
 		const topPlane = new THREE.Mesh(topPlaneGeometry, topPlaneMaterial);
