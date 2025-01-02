@@ -20,7 +20,6 @@ document.addEventListener('DOMContentLoaded', () => {
 		
 		// Create planes with images for airplane
 		const topPlaneGeometry = new THREE.PlaneGeometry(1, 1);
-		const bottomPlaneGeometry = new THREE.PlaneGeometry(1, 1);
 		
 		// Load textures for the planes
 		const topTexture = textureLoader.load('./images/c.jpg');
@@ -82,14 +81,10 @@ document.addEventListener('DOMContentLoaded', () => {
 		});
 		
 		const topPlaneMaterial = new THREE.MeshBasicMaterial({map: topTexture, transparent: true});
-		const bottomPlaneMaterial = new THREE.MeshBasicMaterial({map: bottomTexture, transparent: true});
-		
 		const topPlane = new THREE.Mesh(topPlaneGeometry, topPlaneMaterial);
-		const bottomPlane = new THREE.Mesh(bottomPlaneGeometry, bottomPlaneMaterial);
 		
-		// Position the planes
+		// Position the top plane
 		topPlane.position.set(0, 1, 0);
-		bottomPlane.position.set(0, -1, 0);
 		
 		const airplane = await loadGLTF("./airplane/scene.gltf");
 		airplane.scene.scale.set(0.5, 0.5, 0.5);
