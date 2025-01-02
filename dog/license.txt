@@ -1,0 +1,11 @@
+Model Information:
+* title:	Dog from Lamps
+* source:	https://sketchfab.com/3d-models/dog-from-lamps-a43ed994cafc43ebae92dad0440c246b
+* author:	Flightyfelon (https://sketchfab.com/Flightyfelon)
+
+Model License:
+* license type:	CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)
+* requirements:	Author must be credited. Commercial use is allowed.
+
+If you use this 3D model in your project be sure to copy paste this credit wherever you share it:
+This work is based on "Dog from Lamps" (https://sketchfab.com/3d-models/dog-from-lamps-a43ed994cafc43ebae92dad0440c246b) by Flightyfelon (https://sketchfab.com/Flightyfelon) licensed under CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)
