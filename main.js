@@ -126,9 +126,9 @@ document.addEventListener('DOMContentLoaded', () => {
 		const videoTexture = new THREE.VideoTexture(video);
 		
 		// Create About Us plane with modern design
-		const aboutUsGeometry = new THREE.PlaneGeometry(1, 1.2); // Slightly smaller
+		const aboutUsGeometry = new THREE.PlaneGeometry(1.4, 1.2); // Increased width from 1.0 to 1.4
 		const aboutUsCanvas = document.createElement('canvas');
-		aboutUsCanvas.width = 512;
+		aboutUsCanvas.width = 700;  // Increased from 512 to 700 for better text resolution
 		aboutUsCanvas.height = 768;
 		const aboutUsContext = aboutUsCanvas.getContext('2d');
 		
@@ -160,46 +160,41 @@ document.addEventListener('DOMContentLoaded', () => {
 		aboutUsContext.fillStyle = 'white';
 		aboutUsContext.textAlign = 'left';
 		
-		// Title text with League Spartan
+		// Title text with League Spartan - Adjusted positions
 		aboutUsContext.font = 'bold 76px "League Spartan", sans-serif';
 		aboutUsContext.letterSpacing = '3px';
-		aboutUsContext.fillText('ABOUT', 50, 110);
+		aboutUsContext.fillText('ABOUT', 60, 110);  // Slightly increased left padding
 		aboutUsContext.font = '300 44px "League Spartan", sans-serif';
-		aboutUsContext.fillText('US', 50, 160);
+		aboutUsContext.fillText('US', 60, 160);     // Matching left padding
 		
-		// Add decorative elements - Aligned left
+		// Add decorative elements - Adjusted width
 		aboutUsContext.beginPath();
-		aboutUsContext.moveTo(50, 190);
-		aboutUsContext.lineTo(250, 190);
-		aboutUsContext.strokeStyle = '#FF9CC7';    // Light magenta for accents
+		aboutUsContext.moveTo(60, 190);
+		aboutUsContext.lineTo(300, 190);  // Increased line width
+		aboutUsContext.strokeStyle = '#FF9CC7';
 		aboutUsContext.lineWidth = 2;
 		aboutUsContext.stroke();
 		
-		// Add second decorative line
-		aboutUsContext.beginPath();
-		aboutUsContext.moveTo(50, 195);
-		aboutUsContext.lineTo(200, 195);
-		aboutUsContext.strokeStyle = 'rgba(255, 182, 182, 0.5)';  // Lighter red with opacity
-		aboutUsContext.lineWidth = 1;
-		aboutUsContext.stroke();
-		
-		// Add modern description with Montserrat font - Left aligned
+		// Add modern description with adjusted font sizes and positions
 		const descriptions = [
-			{ text: 'AI-powered mock interviews', size: 48, weight: '600', y: 280 },
-			{ text: 'college-specific aptitude tests.', size: 44, weight: '500', y: 340 },
-			{ text: 'Master your interview skills', size: 34, weight: '400', y: 400 },
-			{ text: 'with detailed, personalized feedback', size: 40, weight: '600', y: 460 }
+			{ text: 'AI-powered mock', size: 46, weight: '600', y: 280 },
+			{ text: 'interviews with', size: 46, weight: '600', y: 330 },
+			{ text: 'college-specific', size: 42, weight: '500', y: 380 },
+			{ text: 'aptitude tests.', size: 42, weight: '500', y: 430 },
+			{ text: 'Master your skills with', size: 38, weight: '400', y: 490 },
+			{ text: 'detailed feedback', size: 40, weight: '600', y: 540 }
 		];
 		
 		descriptions.forEach(desc => {
 			aboutUsContext.font = `${desc.weight} ${desc.size}px Montserrat, sans-serif`;
+			
 			aboutUsContext.letterSpacing = '2px';
-			aboutUsContext.fillText(desc.text, 50, desc.y);
+			aboutUsContext.fillText(desc.text, 60, desc.y);  // Consistent left padding
 		});
 		
-		// Add modern accent elements - Aligned left
-		aboutUsContext.fillStyle = '#FF9CC7';  // Light magenta for accents
-		aboutUsContext.fillRect(50, 480, 50, 2);
+		// Adjust accent element position
+		aboutUsContext.fillStyle = '#FF9CC7';
+		aboutUsContext.fillRect(60, 580, 50, 2);
 		
 		// Add subtle footer design
 		const footerGradient = aboutUsContext.createLinearGradient(0, aboutUsCanvas.height - 120, aboutUsCanvas.width, aboutUsCanvas.height - 120);
