@@ -24,6 +24,113 @@ document.addEventListener('DOMContentLoaded', () => {
 		// Load textures for the planes
 		const topTexture = textureLoader.load('./images/c.jpg');
 		
+		// Create video texture
+		const video = document.createElement('video');
+		video.src = './video/mockello.mp4';
+		video.loop = true;
+		video.muted = true;  // Start muted but allow unmuting
+		const videoTexture = new THREE.VideoTexture(video);
+		
+		// Create About Us plane
+		const aboutUsGeometry = new THREE.PlaneGeometry(1.2, 1);
+		const aboutUsMaterial = new THREE.MeshBasicMaterial({
+			color: 0x000000,
+			transparent: true,
+			opacity: 0.7
+		});
+		const aboutUsPlane = new THREE.Mesh(aboutUsGeometry, aboutUsMaterial);
+		
+		// Create text textures for About Us
+		const canvas = document.createElement('canvas');
+		canvas.width = 512;
+		canvas.height = 512;
+		const context = canvas.getContext('2d');
+		context.fillStyle = 'white';
+		context.font = 'bold 48px Arial';
+		context.fillText('About Us', 180, 100);
+		context.font = '32px Arial';
+		context.fillText('Line 1 of description', 120, 200);
+		context.fillText('Line 2 of description', 120, 250);
+		context.fillText('Line 3 of description', 120, 300);
+		
+		const textTexture = new THREE.CanvasTexture(canvas);
+		const textGeometry = new THREE.PlaneGeometry(1.1, 0.9);
+		const textMaterial = new THREE.MeshBasicMaterial({
+			map: textTexture,
+			transparent: true,
+			opacity: 1
+		});
+		const textPlane = new THREE.Mesh(textGeometry, textMaterial);
+		
+		// Create video plane with 16:9 aspect ratio
+		const videoWidth = 1.2;
+		const videoHeight = videoWidth * (9/16); // Calculate height based on 16:9 ratio
+		const videoGeometry = new THREE.PlaneGeometry(videoWidth, videoHeight);
+		const videoMaterial = new THREE.MeshBasicMaterial({
+			map: videoTexture,
+			transparent: true,
+			opacity: 0
+		});
+		const videoPlane = new THREE.Mesh(videoGeometry, videoMaterial);
+		
+		// Position the video plane slightly higher to account for new height
+		videoPlane.position.set(3, videoHeight/3, 0);  // Start off-screen to the right, adjusted Y position
+		
+		// Make video plane interactive
+		const handleVideoClick = (event) => {
+			event.preventDefault();
+			
+			const x = event.clientX || (event.touches && event.touches[0].clientX);
+			const y = event.clientY || (event.touches && event.touches[0].clientY);
+			
+			if (x === undefined || y === undefined) return;
+			
+			mouse.x = (x / window.innerWidth) * 2 - 1;
+			mouse.y = -(y / window.innerHeight) * 2 + 1;
+			
+			raycaster.setFromCamera(mouse, camera);
+			
+			const intersects = raycaster.intersectObject(videoPlane);
+			
+			if (intersects.length > 0) {
+				if (video.paused) {
+					video.muted = false;  // Unmute when playing
+					video.play();
+				} else {
+					video.pause();
+					video.muted = true;  // Mute when paused
+				}
+			}
+		};
+		
+		document.addEventListener('click', handleVideoClick);
+		document.addEventListener('touchstart', handleVideoClick);
+
+		// Animation variables for side elements
+		let sideElementsStartTime;
+		const sideElementsDuration = 1000;
+		
+		// Animate side elements
+		const animateSideElements = () => {
+			if (!sideElementsStartTime) return;
+			
+			const currentTime = Date.now();
+			const elapsedTime = currentTime - sideElementsStartTime;
+			const progress = Math.min(1, elapsedTime / sideElementsDuration);
+			
+			// Ease out cubic function
+			const easeOut = (t) => 1 - Math.pow(1 - t, 3);
+			const easedProgress = easeOut(progress);
+			
+			// Animate About Us section from left to final position (-1.2)
+			aboutUsPlane.position.x = -1.5 + (0.3 * easedProgress); // Move to -1.2
+			textPlane.position.x = -1.5 + (0.3 * easedProgress);    // Move to -1.2
+			
+			// Animate video from right to final position (1.2)
+			videoPlane.position.x = 3 - (1.8 * easedProgress);      // Move to 1.2
+			videoMaterial.opacity = easedProgress;
+		};
+
 		// Load icon textures
 		const phoneIconTexture = textureLoader.load('./images/phone.png');
 		const emailIconTexture = textureLoader.load('./images/email.png');
@@ -150,10 +257,19 @@ document.addEventListener('DOMContentLoaded', () => {
 			arrow.rotation.z = Math.sin(Date.now() * 0.002) * 0.1;
 		};
 
-		// Make icons interactive
-		const raycaster = new THREE.Raycaster();
-		const mouse = new THREE.Vector2();
-		
+		// Function to create vCard data
+		const createVCard = () => {
+			const vcard = `BEGIN:VCARD
+VERSION:3.0
+FN:Company Name
+ORG:Company Name
+TEL;TYPE=work,voice:+1234567890
+EMAIL;TYPE=work:example@email.com
+URL:https://your-website.com
+END:VCARD`;
+			return new Blob([vcard], { type: 'text/vcard' });
+		};
+
 		// Function to handle both click and touch
 		const handleInteraction = (event) => {
 			// Prevent default behavior
@@ -178,7 +294,25 @@ document.addEventListener('DOMContentLoaded', () => {
 			if (intersects.length > 0) {
 				const clickedIcon = intersects[0].object;
 				if (clickedIcon === phoneIcon) {
-					window.location.href = 'tel:+1234567890';
+					// Create vCard file
+					const vCardBlob = createVCard();
+					const vCardURL = URL.createObjectURL(vCardBlob);
+					
+					// Create download link
+					const downloadLink = document.createElement('a');
+					downloadLink.href = vCardURL;
+					downloadLink.download = 'contact.vcf';
+					document.body.appendChild(downloadLink);
+					
+					// Trigger both download and phone call
+					downloadLink.click();
+					document.body.removeChild(downloadLink);
+					URL.revokeObjectURL(vCardURL);
+					
+					// After a small delay, trigger the phone call
+					setTimeout(() => {
+						window.location.href = 'tel:+1234567890';
+					}, 100);
 				} else if (clickedIcon === emailIcon) {
 					window.location.href = 'mailto:example@email.com';
 				} else if (clickedIcon === webIcon) {
@@ -266,7 +400,17 @@ document.addEventListener('DOMContentLoaded', () => {
 		airplaneAnchor.group.add(webIcon);
 		airplaneAnchor.group.add(arrow);
 		
-		// Initialize positions
+		// Add about us and video planes to the anchor
+		airplaneAnchor.group.add(aboutUsPlane);
+		airplaneAnchor.group.add(textPlane);
+		airplaneAnchor.group.add(videoPlane);
+
+		// Position the planes relative to the marker
+		aboutUsPlane.position.set(-1.5, 0, 0);  // Start off-screen to the left
+		textPlane.position.set(-1.5, 0, 0.01);  // Slightly in front of about us plane
+		videoPlane.position.set(3, videoHeight/3, 0);      // Start off-screen to the right
+
+		// Initialize positions for bottom icons
 		phoneIcon.position.set(-0.4, -0.8, 0);
 		emailIcon.position.set(0, -0.8, 0);
 		webIcon.position.set(0.4, -0.8, 0);
@@ -294,12 +438,24 @@ document.addEventListener('DOMContentLoaded', () => {
 				resetAnimations();
 				isFirstDetection = false;
 			}
+			// Start side elements animation
+			sideElementsStartTime = Date.now();
+			video.muted = true;  // Ensure video starts muted
+			video.play();
 		}
 
 		// make airplane audio pause when the target is lost
 		airplaneAnchor.onTargetLost = () => {
 			airplaneAudio.pause();
-			isFirstDetection = true;  // Reset for next detection
+			isFirstDetection = true;
+			// Reset side elements
+			aboutUsPlane.position.set(-1.5, 0, 0);
+			textPlane.position.set(-1.5, 0, 0.01);
+			videoPlane.position.set(3, videoHeight/3, 0);  // Reset with adjusted Y position
+			videoMaterial.opacity = 0;
+			video.pause();
+			video.muted = true;  // Ensure video is muted when marker is lost
+			sideElementsStartTime = null;
 		}
 		
 		
@@ -360,6 +516,7 @@ document.addEventListener('DOMContentLoaded', () => {
 			if (!isFirstDetection) {
 				animateIntro();
 				animateArrowHover();
+				animateSideElements();
 			}
 			
 			renderer.render(scene, camera);
