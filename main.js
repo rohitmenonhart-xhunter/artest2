@@ -19,12 +19,67 @@ document.addEventListener('DOMContentLoaded', () => {
 		const textureLoader = new THREE.TextureLoader();
 		
 		// Create planes with images for airplane
-		const topPlaneGeometry = new THREE.PlaneGeometry(1, 1); // Adjust size as needed
+		const topPlaneGeometry = new THREE.PlaneGeometry(1, 1);
 		const bottomPlaneGeometry = new THREE.PlaneGeometry(1, 1);
 		
-		// Load textures for the planes - replace with your image paths
-		const topTexture = textureLoader.load('./images/c.jpg'); // Replace with your top image
-		const bottomTexture = textureLoader.load('./images/d.jpg'); // Replace with your bottom image
+		// Load textures for the planes
+		const topTexture = textureLoader.load('./images/c.jpg');
+		
+		// Load icon textures
+		const phoneIconTexture = textureLoader.load('./images/phone.png');
+		const emailIconTexture = textureLoader.load('./images/email.png');
+		const webIconTexture = textureLoader.load('./images/web.png');
+		const arrowTexture = textureLoader.load('./images/arrow.png');
+		
+		// Create materials for icons
+		const phoneMaterial = new THREE.MeshBasicMaterial({map: phoneIconTexture, transparent: true});
+		const emailMaterial = new THREE.MeshBasicMaterial({map: emailIconTexture, transparent: true});
+		const webMaterial = new THREE.MeshBasicMaterial({map: webIconTexture, transparent: true});
+		const arrowMaterial = new THREE.MeshBasicMaterial({map: arrowTexture, transparent: true});
+		
+		// Create icon planes (smaller size for icons)
+		const iconGeometry = new THREE.PlaneGeometry(0.3, 0.3);
+		const phoneIcon = new THREE.Mesh(iconGeometry, phoneMaterial);
+		const emailIcon = new THREE.Mesh(iconGeometry, emailMaterial);
+		const webIcon = new THREE.Mesh(iconGeometry, webMaterial);
+		
+		// Create arrow
+		const arrowGeometry = new THREE.PlaneGeometry(0.4, 0.4);
+		const arrow = new THREE.Mesh(arrowGeometry, arrowMaterial);
+		
+		// Position icons at the bottom
+		phoneIcon.position.set(-0.4, -0.8, 0);
+		emailIcon.position.set(0, -0.8, 0);
+		webIcon.position.set(0.4, -0.8, 0);
+		arrow.position.set(0, -0.4, 0);
+		
+		// Make icons interactive
+		const raycaster = new THREE.Raycaster();
+		const mouse = new THREE.Vector2();
+		
+		// Add click event listener
+		document.addEventListener('click', (event) => {
+			// Calculate mouse position in normalized device coordinates
+			mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
+			mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
+			
+			// Update the picking ray with the camera and mouse position
+			raycaster.setFromCamera(mouse, camera);
+			
+			// Calculate objects intersecting the picking ray
+			const intersects = raycaster.intersectObjects([phoneIcon, emailIcon, webIcon]);
+			
+			if (intersects.length > 0) {
+				const clickedIcon = intersects[0].object;
+				if (clickedIcon === phoneIcon) {
+					window.location.href = 'tel:+1234567890'; // Replace with your phone number
+				} else if (clickedIcon === emailIcon) {
+					window.location.href = 'mailto:example@email.com'; // Replace with your email
+				} else if (clickedIcon === webIcon) {
+					window.location.href = 'https://your-website.com'; // Replace with your website
+				}
+			}
+		});
 		
 		const topPlaneMaterial = new THREE.MeshBasicMaterial({map: topTexture, transparent: true});
 		const bottomPlaneMaterial = new THREE.MeshBasicMaterial({map: bottomTexture, transparent: true});
@@ -33,8 +88,8 @@ document.addEventListener('DOMContentLoaded', () => {
 		const bottomPlane = new THREE.Mesh(bottomPlaneGeometry, bottomPlaneMaterial);
 		
 		// Position the planes
-		topPlane.position.set(0, 1, 0); // Adjust Y value to position above model
-		bottomPlane.position.set(0, -1, 0); // Adjust Y value to position below model
+		topPlane.position.set(0, 1, 0);
+		bottomPlane.position.set(0, -1, 0);
 		
 		const airplane = await loadGLTF("./airplane/scene.gltf");
 		airplane.scene.scale.set(0.5, 0.5, 0.5);
@@ -84,9 +139,32 @@ document.addEventListener('DOMContentLoaded', () => {
 
 		const airplaneAnchor = mindarThree.addAnchor(0);
 		airplaneAnchor.group.add(airplane.scene);
-		// Add the planes to the anchor group
 		airplaneAnchor.group.add(topPlane);
-		airplaneAnchor.group.add(bottomPlane);
+		// Add icons and arrow to the anchor group
+		airplaneAnchor.group.add(phoneIcon);
+		airplaneAnchor.group.add(emailIcon);
+		airplaneAnchor.group.add(webIcon);
+		airplaneAnchor.group.add(arrow);
+		
+		// Animate the arrow
+		const animateArrow = () => {
+			arrow.position.y = -0.4 + Math.sin(Date.now() * 0.003) * 0.1; // Smooth up and down motion
+			arrow.rotation.z = Math.sin(Date.now() * 0.002) * 0.1; // Slight rotation
+		};
+		
+		// Add arrow animation to the render loop
+		renderer.setAnimationLoop(() => {
+			const delta = clock.getDelta();
+			airplaneMixer.update(delta);
+			
+			ballMixer.update(delta);
+			carMixer.update(delta);
+			car.scene.rotation.set(0, car.scene.rotation.y + delta, 0);
+			dogMixer.update(delta);
+			animateArrow(); // Add arrow animation
+			renderer.render(scene, camera);
+		});
+		
 		// added listener to the camera
 		camera.add(airListener);
 		// we set the referal distance from which the audio should fade out
