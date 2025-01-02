@@ -178,11 +178,25 @@ document.addEventListener('DOMContentLoaded', () => {
 			if (intersects.length > 0) {
 				const clickedIcon = intersects[0].object;
 				if (clickedIcon === phoneIcon) {
-					window.open('tel:+1234567890', '_blank'); // Replace with your phone number
+					window.location.href = 'tel:+1234567890';
 				} else if (clickedIcon === emailIcon) {
-					window.open('mailto:example@email.com', '_blank'); // Replace with your email
+					window.location.href = 'mailto:example@email.com';
 				} else if (clickedIcon === webIcon) {
-					window.open('https://your-website.com', '_blank'); // Replace with your website
+					// Add timestamp to prevent caching
+					const timestamp = new Date().getTime();
+					const url = new URL('https://your-website.com');
+					url.searchParams.append('t', timestamp);
+					
+					// Create a new window/tab with cache-control headers
+					const newWindow = window.open('about:blank', '_blank');
+					if (newWindow) {
+						newWindow.location.href = url.toString();
+						// Force reload without cache
+						newWindow.location.reload(true);
+					} else {
+						// Fallback if popup is blocked
+						window.location.href = url.toString();
+					}
 				}
 			}
 		};
