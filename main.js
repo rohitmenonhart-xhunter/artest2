@@ -59,15 +59,31 @@ document.addEventListener('DOMContentLoaded', () => {
 		arrow.scale.set(0, 0, 0);
 
 		// Animation timing variables
-		const startTime = Date.now();
-		const introDuration = 1000; // 1 second for intro animation
-		const staggerDelay = 200;   // 200ms delay between each icon
-		
+		let startTime = Date.now();
+		const introDuration = 1000;
+		const staggerDelay = 200;
+
+		// Reset function for animations
+		const resetAnimations = () => {
+			startTime = Date.now();
+			// Reset positions and scales
+			phoneIcon.position.set(-0.4, 2, 0);
+			emailIcon.position.set(0, 2, 0);
+			webIcon.position.set(0.4, 2, 0);
+			arrow.position.set(0, 2, 0);
+
+			phoneIcon.scale.set(0, 0, 0);
+			emailIcon.scale.set(0, 0, 0);
+			webIcon.scale.set(0, 0, 0);
+			arrow.scale.set(0, 0, 0);
+		};
+
 		// Final positions
 		const finalPositions = {
 			arrow: -0.4,
 			phone: -0.8,
 			email: -0.8,
+			
 			web: -0.8
 		};
 
@@ -217,47 +233,45 @@ document.addEventListener('DOMContentLoaded', () => {
 		const airplaneAnchor = mindarThree.addAnchor(0);
 		airplaneAnchor.group.add(airplane.scene);
 		airplaneAnchor.group.add(topPlane);
-		// Add icons and arrow to the anchor group
 		airplaneAnchor.group.add(phoneIcon);
 		airplaneAnchor.group.add(emailIcon);
 		airplaneAnchor.group.add(webIcon);
 		airplaneAnchor.group.add(arrow);
 		
-		// Add arrow animation to the render loop
-		renderer.setAnimationLoop(() => {
-			const delta = clock.getDelta();
-			airplaneMixer.update(delta);
-			
-			ballMixer.update(delta);
-			carMixer.update(delta);
-			car.scene.rotation.set(0, car.scene.rotation.y + delta, 0);
-			dogMixer.update(delta);
-			
-			// Run both animations
-			animateIntro();
-			animateArrowHover();
-			
-			renderer.render(scene, camera);
-		});
-		
-		// added listener to the camera
+		// Initialize positions
+		phoneIcon.position.set(-0.4, -0.8, 0);
+		emailIcon.position.set(0, -0.8, 0);
+		webIcon.position.set(0.4, -0.8, 0);
+		arrow.position.set(0, -0.4, 0);
+
+		// Set initial scales to normal
+		phoneIcon.scale.set(1, 1, 1);
+		emailIcon.scale.set(1, 1, 1);
+		webIcon.scale.set(1, 1, 1);
+		arrow.scale.set(1, 1, 1);
+
+		let isFirstDetection = true;
+
+		// Setup audio
 		camera.add(airListener);
-		// we set the referal distance from which the audio should fade out
 		airplaneAudio.setRefDistance(100);
-		// set the buffer of audio to stream
 		airplaneAudio.setBuffer(airplaneAclip);
-		// we sset the audio to loop
 		airplaneAudio.setLoop(true);
-		// we added the audio to the anchor of airplane which will be activated on seeing  the airplane image
-		airplaneAnchor.group.add(airplaneAudio)
-		
-		// make airplane audio play only when the target of airplane image is detected
+		airplaneAnchor.group.add(airplaneAudio);
+
+		// make airplane audio play and reset animations when the target is detected
 		airplaneAnchor.onTargetFound = () => {
 			airplaneAudio.play();
+			if (isFirstDetection) {
+				resetAnimations();
+				isFirstDetection = false;
+			}
 		}
-		// make airplane audio pause then the target image is lost in the camera
+
+		// make airplane audio pause when the target is lost
 		airplaneAnchor.onTargetLost = () => {
 			airplaneAudio.pause();
+			isFirstDetection = true;  // Reset for next detection
 		}
 		
 		
@@ -301,13 +315,25 @@ document.addEventListener('DOMContentLoaded', () => {
 		
 		await mindarThree.start();		
 		
+		// Single animation loop
 		renderer.setAnimationLoop(() => {
 			const delta = clock.getDelta();
+			
+			// Update all mixers
 			airplaneMixer.update(delta);
 			ballMixer.update(delta);
 			carMixer.update(delta);
-			car.scene.rotation.set(0, car.scene.rotation.y + delta, 0);
 			dogMixer.update(delta);
+			
+			// Update car rotation
+			car.scene.rotation.set(0, car.scene.rotation.y + delta, 0);
+			
+			// Run animations if they're active
+			if (!isFirstDetection) {
+				animateIntro();
+				animateArrowHover();
+			}
+			
 			renderer.render(scene, camera);
 		});
 	}
