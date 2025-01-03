@@ -43,78 +43,110 @@ document.addEventListener('DOMContentLoaded', () => {
 		const textureLoader = new THREE.TextureLoader();
 		
 		// Create top title plane with modern design
-		const topGeometry = new THREE.PlaneGeometry(1.6, 0.6); // Adjusted for text
+		const topGeometry = new THREE.PlaneGeometry(1.6, 0.6);
 		const topCanvas = document.createElement('canvas');
-		topCanvas.width = 768;  // Wider for better text quality
+		topCanvas.width = 768;
 		topCanvas.height = 256;
 		const topContext = topCanvas.getContext('2d');
 		
-		// Create modern gradient for top section
-		const topGradient = topContext.createLinearGradient(0, 0, topCanvas.width, 0);
-		topGradient.addColorStop(0, '#A02568');   // Main magenta
-		topGradient.addColorStop(0.5, '#B52C77');  // Slightly lighter magenta
-		topGradient.addColorStop(1, '#A02568');    // Main magenta
-		topContext.fillStyle = topGradient;
+		// Create transparent background with enhanced blur effect
+		topContext.fillStyle = 'rgba(255, 255, 255, 0.02)';
 		topContext.fillRect(0, 0, topCanvas.width, topCanvas.height);
 		
-		// Add rounded corners to top section
+		// Add enhanced glass effect with stronger blur
+		const glassGradient = topContext.createLinearGradient(0, 0, 0, topCanvas.height);
+		glassGradient.addColorStop(0, 'rgba(255, 255, 255, 0.25)');
+		glassGradient.addColorStop(0.5, 'rgba(255, 255, 255, 0.15)');
+		glassGradient.addColorStop(1, 'rgba(255, 255, 255, 0.08)');
+		topContext.fillStyle = glassGradient;
+		topContext.fillRect(0, 0, topCanvas.width, topCanvas.height);
+		
+		// Add more pronounced noise texture for enhanced blur effect
+		for(let i = 0; i < 200; i++) {
+			topContext.fillStyle = `rgba(255, 255, 255, ${Math.random() * 0.03})`;
+			topContext.fillRect(
+				Math.random() * topCanvas.width,
+				Math.random() * topCanvas.height,
+				2,
+				2
+			);
+		}
+		
+		// Add additional blur layer
+		const blurGradient = topContext.createRadialGradient(
+			topCanvas.width/2, topCanvas.height/2, 0,
+			topCanvas.width/2, topCanvas.height/2, topCanvas.width/2
+		);
+		blurGradient.addColorStop(0, 'rgba(255, 255, 255, 0.1)');
+		blurGradient.addColorStop(1, 'rgba(255, 255, 255, 0)');
+		topContext.fillStyle = blurGradient;
+		topContext.fillRect(0, 0, topCanvas.width, topCanvas.height);
+		
+		// Add rounded corners with larger radius
 		topContext.globalCompositeOperation = 'destination-in';
 		topContext.beginPath();
-		const cornerRadius = 20;
-		topContext.roundRect(0, 0, topCanvas.width, topCanvas.height, cornerRadius);
+		topContext.roundRect(0, 0, topCanvas.width, topCanvas.height, 40);
 		topContext.fill();
 		topContext.globalCompositeOperation = 'source-over';
 		
-		// Add subtle pattern to top
-		topContext.fillStyle = 'rgba(255, 255, 255, 0.03)';
-		for(let i = 0; i < 5; i++) {
-			topContext.fillRect(0, i * 50, topCanvas.width, 1);
-		}
-		
-		// Add main title with shadow
-		topContext.shadowColor = 'rgba(0, 0, 0, 0.3)';
-		topContext.shadowBlur = 15;
-		topContext.shadowOffsetY = 5;
+		// Add main title with enhanced shadow
+		topContext.shadowColor = 'rgba(0, 0, 0, 0.4)';
+		topContext.shadowBlur = 25;
+		topContext.shadowOffsetY = 8;
 		topContext.fillStyle = 'white';
 		topContext.textAlign = 'center';
 		
-		// Draw "Mockello" text with League Spartan style
-		topContext.font = 'bold 92px "League Spartan", sans-serif';
-		topContext.letterSpacing = '3px';
-		topContext.fillText('MOCKELLO', topCanvas.width/2, 110);
+		// Draw "MOCKELLO" text with ultra-modern font stack
+		topContext.font = 'bold 110px "Neue Haas Grotesk Display Pro", "Roobert", "Space Grotesk", sans-serif';
+		topContext.letterSpacing = '8px';
+		// Add slight gradient to text
+		const textGradient = topContext.createLinearGradient(0, 80, 0, 160);
+		textGradient.addColorStop(0, 'rgba(255, 255, 255, 1)');
+		textGradient.addColorStop(1, 'rgba(255, 255, 255, 0.95)');
+		topContext.fillStyle = textGradient;
+		topContext.fillText('MOCKELLO', topCanvas.width/2, 120);
 		
-		// Add subtitle with Montserrat
-		topContext.shadowBlur = 10;
-		topContext.font = '500 28px Montserrat, sans-serif';
-		topContext.letterSpacing = '2px';
-		topContext.fillText('YOUR PERSONAL INTERVIEW TRAINER', topCanvas.width/2, 170);
+		// Add modern subtitle
+		topContext.shadowBlur = 15;
+		topContext.shadowOffsetY = 4;
+		topContext.font = '500 24px "Cabinet Grotesk", "Roobert", sans-serif';
+		topContext.letterSpacing = '8px';
+		topContext.fillStyle = 'rgba(255, 255, 255, 0.9)';
+		topContext.fillText('YOUR PERSONAL INTERVIEW TRAINER', topCanvas.width/2, 175);
 		
-		// Add decorative elements
+		// Add subtle accent lines with gradient
 		topContext.shadowColor = 'transparent';
-		topContext.strokeStyle = '#FF9CC7';  // Light magenta
+		const lineGradient = topContext.createLinearGradient(
+			topCanvas.width/2 - 220, 0,
+			topCanvas.width/2 + 220, 0
+		);
+		lineGradient.addColorStop(0, 'rgba(255, 255, 255, 0)');
+		lineGradient.addColorStop(0.5, 'rgba(255, 255, 255, 0.3)');
+		lineGradient.addColorStop(1, 'rgba(255, 255, 255, 0)');
 		
-		// Top line
+		// Top accent
+		topContext.strokeStyle = lineGradient;
 		topContext.beginPath();
-		topContext.moveTo(topCanvas.width/2 - 200, 50);
-		topContext.lineTo(topCanvas.width/2 + 200, 50);
-		topContext.lineWidth = 2;
+		topContext.moveTo(topCanvas.width/2 - 220, 65);
+		topContext.lineTo(topCanvas.width/2 + 220, 65);
+		topContext.lineWidth = 1;
 		topContext.stroke();
 		
-		// Bottom line
+		// Bottom accent
 		topContext.beginPath();
-		topContext.moveTo(topCanvas.width/2 - 150, 190);
-		topContext.lineTo(topCanvas.width/2 + 150, 190);
-		topContext.lineWidth = 1;
+		topContext.moveTo(topCanvas.width/2 - 180, 195);
+		topContext.lineTo(topCanvas.width/2 + 180, 195);
+		topContext.lineWidth = 0.5;
 		topContext.stroke();
 		
 		const topTexture = new THREE.CanvasTexture(topCanvas);
 		const topMaterial = new THREE.MeshBasicMaterial({
 			map: topTexture,
 			transparent: true,
-			opacity: 0.95
+			opacity: 0.75  // Increased transparency for better blur effect
 		});
 		const topPlane = new THREE.Mesh(topGeometry, topMaterial);
-		topPlane.position.set(0, 1.2, 0);
+		topPlane.position.set(0, 1.5, 0);  // Moved higher (from 1.2 to 1.5)
 		
 		// Create video texture with larger size
 		const video = document.createElement('video');
@@ -126,21 +158,25 @@ document.addEventListener('DOMContentLoaded', () => {
 		const videoTexture = new THREE.VideoTexture(video);
 		
 		// Create About Us plane with modern design
-		const aboutUsGeometry = new THREE.PlaneGeometry(1.4, 1.2); // Increased width from 1.0 to 1.4
+		const aboutUsGeometry = new THREE.PlaneGeometry(1.4, 1.2);
 		const aboutUsCanvas = document.createElement('canvas');
-		aboutUsCanvas.width = 700;  // Increased from 512 to 700 for better text resolution
+		aboutUsCanvas.width = 700;
 		aboutUsCanvas.height = 768;
 		const aboutUsContext = aboutUsCanvas.getContext('2d');
 		
-		// Create modern gradient background for About Us
-		const gradient = aboutUsContext.createLinearGradient(0, 0, aboutUsCanvas.width, aboutUsCanvas.height);
-		gradient.addColorStop(0, '#A02568');    // Main magenta
-		gradient.addColorStop(0.5, '#B52C77');  // Slightly lighter magenta
-		gradient.addColorStop(1, '#8B1F59');    // Slightly darker magenta
-		aboutUsContext.fillStyle = gradient;
+		// Create transparent background with blur effect for About Us
+		aboutUsContext.fillStyle = 'rgba(255, 255, 255, 0.1)';
 		aboutUsContext.fillRect(0, 0, aboutUsCanvas.width, aboutUsCanvas.height);
 		
-		// Add rounded corners to about section
+		// Add glass effect
+		const aboutGlassGradient = aboutUsContext.createLinearGradient(0, 0, 0, aboutUsCanvas.height);
+		aboutGlassGradient.addColorStop(0, 'rgba(255, 255, 255, 0.2)');
+		aboutGlassGradient.addColorStop(0.5, 'rgba(255, 255, 255, 0.15)');
+		aboutGlassGradient.addColorStop(1, 'rgba(255, 255, 255, 0.1)');
+		aboutUsContext.fillStyle = aboutGlassGradient;
+		aboutUsContext.fillRect(0, 0, aboutUsCanvas.width, aboutUsCanvas.height);
+		
+		// Add rounded corners
 		aboutUsContext.globalCompositeOperation = 'destination-in';
 		aboutUsContext.beginPath();
 		aboutUsContext.roundRect(0, 0, aboutUsCanvas.width, aboutUsCanvas.height, 30);
@@ -148,83 +184,132 @@ document.addEventListener('DOMContentLoaded', () => {
 		aboutUsContext.globalCompositeOperation = 'source-over';
 		
 		// Add subtle pattern
-		aboutUsContext.fillStyle = 'rgba(255, 255, 255, 0.03)';
+		aboutUsContext.fillStyle = 'rgba(255, 255, 255, 0.05)';
 		for(let i = 0; i < 10; i++) {
-			aboutUsContext.fillRect(0, i * 80, aboutUsCanvas.width, 2);
+			aboutUsContext.fillRect(0, i * 80, aboutUsCanvas.width, 1);
 		}
 		
-		// Modern title with League Spartan/Montserrat combo - Left aligned
-		aboutUsContext.shadowColor = 'rgba(0, 0, 0, 0.3)';
-		aboutUsContext.shadowBlur = 15;
-		aboutUsContext.shadowOffsetY = 5;
+		// Modern title with enhanced shadow
+		aboutUsContext.shadowColor = 'rgba(0, 0, 0, 0.4)';
+		aboutUsContext.shadowBlur = 20;
+		aboutUsContext.shadowOffsetY = 6;
 		aboutUsContext.fillStyle = 'white';
 		aboutUsContext.textAlign = 'left';
 		
-		// Title text with League Spartan - Adjusted positions
-		aboutUsContext.font = 'bold 76px "League Spartan", sans-serif';
-		aboutUsContext.letterSpacing = '3px';
-		aboutUsContext.fillText('ABOUT', 60, 110);  // Slightly increased left padding
-		aboutUsContext.font = '300 44px "League Spartan", sans-serif';
-		aboutUsContext.fillText('US', 60, 160);     // Matching left padding
-		
-		// Add decorative elements - Adjusted width
-		aboutUsContext.beginPath();
-		aboutUsContext.moveTo(60, 190);
-		aboutUsContext.lineTo(300, 190);  // Increased line width
-		aboutUsContext.strokeStyle = '#FF9CC7';
-		aboutUsContext.lineWidth = 2;
-		aboutUsContext.stroke();
+		// Title text with modern font
+		aboutUsContext.font = 'bold 80px "Clash Display", "Space Grotesk", sans-serif';
+		aboutUsContext.letterSpacing = '4px';
+		aboutUsContext.fillText('ABOUT', 60, 110);
+		aboutUsContext.font = '300 46px "Cabinet Grotesk", "Space Grotesk", sans-serif';
+		aboutUsContext.fillText('US', 60, 160);
 		
 		// Add modern description with adjusted font sizes and positions
 		const descriptions = [
-			{ text: 'AI-powered mock', size: 46, weight: '600', y: 280 },
-			{ text: 'interviews with', size: 46, weight: '600', y: 330 },
-			{ text: 'college-specific', size: 42, weight: '500', y: 380 },
-			{ text: 'aptitude tests.', size: 42, weight: '500', y: 430 },
-			{ text: 'Master your skills with', size: 38, weight: '400', y: 490 },
-			{ text: 'detailed feedback', size: 40, weight: '600', y: 540 }
+			{ text: 'AI-powered mock', size: 48, weight: '600', y: 280 },
+			{ text: 'interviews with', size: 48, weight: '600', y: 330 },
+			{ text: 'college-specific', size: 44, weight: '500', y: 380 },
+			{ text: 'aptitude tests.', size: 44, weight: '500', y: 430 },
+			{ text: 'Master your skills with', size: 40, weight: '400', y: 490 },
+			{ text: 'detailed feedback', size: 42, weight: '600', y: 540 }
 		];
 		
 		descriptions.forEach(desc => {
-			aboutUsContext.font = `${desc.weight} ${desc.size}px Montserrat, sans-serif`;
-			
+			aboutUsContext.font = `${desc.weight} ${desc.size}px "Space Grotesk", sans-serif`;
 			aboutUsContext.letterSpacing = '2px';
-			aboutUsContext.fillText(desc.text, 60, desc.y);  // Consistent left padding
+			aboutUsContext.fillText(desc.text, 60, desc.y);
 		});
 		
-		// Adjust accent element position
-		aboutUsContext.fillStyle = '#FF9CC7';
-		aboutUsContext.fillRect(60, 580, 50, 2);
-		
-		// Add subtle footer design
-		const footerGradient = aboutUsContext.createLinearGradient(0, aboutUsCanvas.height - 120, aboutUsCanvas.width, aboutUsCanvas.height - 120);
-		footerGradient.addColorStop(0, 'rgba(255, 255, 255, 0)');
-		footerGradient.addColorStop(0.5, 'rgba(255, 255, 255, 0.1)');
-		footerGradient.addColorStop(1, 'rgba(255, 255, 255, 0)');
-		aboutUsContext.fillStyle = footerGradient;
-		aboutUsContext.fillRect(0, aboutUsCanvas.height - 120, aboutUsCanvas.width, 40);
+		// Add accent elements
+		aboutUsContext.strokeStyle = 'rgba(255, 255, 255, 0.3)';
+		aboutUsContext.beginPath();
+		aboutUsContext.moveTo(60, 190);
+		aboutUsContext.lineTo(300, 190);
+		aboutUsContext.lineWidth = 1;
+		aboutUsContext.stroke();
 		
 		const aboutUsTexture = new THREE.CanvasTexture(aboutUsCanvas);
 		const aboutUsMaterial = new THREE.MeshBasicMaterial({
 			map: aboutUsTexture,
 			transparent: true,
-			opacity: 0.95
+			opacity: 0.9
 		});
 		const aboutUsPlane = new THREE.Mesh(aboutUsGeometry, aboutUsMaterial);
 		
-		// Create larger video plane with 16:9 aspect ratio
-		const videoWidth = 1.6;  // Increased size
+		// Create video plane with glass effect background
+		const videoWidth = 1.6;
 		const videoHeight = videoWidth * (9/16);
 		const videoGeometry = new THREE.PlaneGeometry(videoWidth, videoHeight);
+		
+		// Create a canvas for video background
+		const videoBackCanvas = document.createElement('canvas');
+		videoBackCanvas.width = 512;
+		videoBackCanvas.height = 512;
+		const videoBackContext = videoBackCanvas.getContext('2d');
+		
+		// Add glass effect to video background
+		const videoGlassGradient = videoBackContext.createLinearGradient(0, 0, 0, videoBackCanvas.height);
+		videoGlassGradient.addColorStop(0, 'rgba(255, 255, 255, 0.15)');
+		videoGlassGradient.addColorStop(1, 'rgba(255, 255, 255, 0.1)');
+		videoBackContext.fillStyle = videoGlassGradient;
+		videoBackContext.fillRect(0, 0, videoBackCanvas.width, videoBackCanvas.height);
+		
+		// Add rounded corners to video
+		videoBackContext.globalCompositeOperation = 'destination-in';
+		videoBackContext.beginPath();
+		videoBackContext.roundRect(0, 0, videoBackCanvas.width, videoBackCanvas.height, 30);
+		videoBackContext.fill();
+		
+		const videoBackTexture = new THREE.CanvasTexture(videoBackCanvas);
+		
+		// Create video materials
+		const videoBackMaterial = new THREE.MeshBasicMaterial({
+			map: videoBackTexture,
+			transparent: true,
+			opacity: 0.9
+		});
+		
 		const videoMaterial = new THREE.MeshBasicMaterial({
 			map: videoTexture,
 			transparent: true,
 			opacity: 0
 		});
+		
+		// Create video planes
+		const videoBackPlane = new THREE.Mesh(videoGeometry, videoBackMaterial);
 		const videoPlane = new THREE.Mesh(videoGeometry, videoMaterial);
 		
-		// Position the video plane slightly lower to accommodate top image
+		// Position video planes
+		videoBackPlane.position.set(3, videoHeight/4, -0.01); // Slightly behind video
 		videoPlane.position.set(3, videoHeight/4, 0);
+		
+		// Create bottom section with glass effect
+		const bottomGeometry = new THREE.PlaneGeometry(1.8, 0.4);
+		const bottomCanvas = document.createElement('canvas');
+		bottomCanvas.width = 512;
+		bottomCanvas.height = 128;
+		const bottomContext = bottomCanvas.getContext('2d');
+		
+		// Add glass effect to bottom section
+		const bottomGlassGradient = bottomContext.createLinearGradient(0, 0, 0, bottomCanvas.height);
+		bottomGlassGradient.addColorStop(0, 'rgba(255, 255, 255, 0.15)');
+		bottomGlassGradient.addColorStop(1, 'rgba(255, 255, 255, 0.1)');
+		bottomContext.fillStyle = bottomGlassGradient;
+		bottomContext.fillRect(0, 0, bottomCanvas.width, bottomCanvas.height);
+		
+		// Add rounded corners to bottom section
+		bottomContext.globalCompositeOperation = 'destination-in';
+		bottomContext.beginPath();
+		bottomContext.roundRect(0, 0, bottomCanvas.width, bottomCanvas.height, 20);
+		bottomContext.fill();
+		
+		const bottomTexture = new THREE.CanvasTexture(bottomCanvas);
+		const bottomMaterial = new THREE.MeshBasicMaterial({
+			map: bottomTexture,
+			transparent: true,
+			opacity: 0.9
+		});
+		const bottomPlane = new THREE.Mesh(bottomGeometry, bottomMaterial);
+		bottomPlane.position.set(0, -0.9, -0.1); // Position behind icons
 		
 		// Load icon textures
 		const phoneIconTexture = textureLoader.load('./images/phone.png');
@@ -332,11 +417,13 @@ END:VCARD`;
 		const anchor = mindarThree.addAnchor(0);
 		anchor.group.add(topPlane);      // Add top plane
 		anchor.group.add(aboutUsPlane);
+		anchor.group.add(videoBackPlane);
 		anchor.group.add(videoPlane);
 		anchor.group.add(phoneIcon);
 		anchor.group.add(emailIcon);
 		anchor.group.add(webIcon);       // Add web icon back
 		anchor.group.add(arrow);         // Add arrow back
+		anchor.group.add(bottomPlane);
 		
 		// Animation variables
 		let startTime = Date.now();
@@ -458,7 +545,7 @@ END:VCARD`;
 			arrow.scale.set(1, 1, 1);
 		};
 		
-		await mindarThree.start();
+		await mindarThree.start();		
 		
 		// Animation loop
 		renderer.setAnimationLoop(() => {
